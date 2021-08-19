@@ -9,6 +9,7 @@ import com.example.android.trackmysleepquality.R
 import com.example.android.trackmysleepquality.convertDurationToFormatted
 import com.example.android.trackmysleepquality.convertNumericQualityToString
 import com.example.android.trackmysleepquality.database.SleepNight
+import com.example.android.trackmysleepquality.databinding.FragmentSleepQualityBinding.inflate
 import com.example.android.trackmysleepquality.databinding.ListItemSleepTrackerBinding
 
 /**
@@ -17,9 +18,10 @@ import com.example.android.trackmysleepquality.databinding.ListItemSleepTrackerB
  * @Author:         skyHuang
  * @CreateDate:     2021/7/28 19:11
  */
-class SleepNightAdapter : ListAdapter<SleepNight, SleepNightAdapter.ViewHolder>(SleepNightDiffCallback()) {
+class SleepNightAdapter(private val listener: ItemClickListener) : ListAdapter<SleepNight, SleepNightAdapter.ViewHolder>(SleepNightDiffCallback) {
 
-    class SleepNightDiffCallback : DiffUtil.ItemCallback<SleepNight>() {
+
+    companion object SleepNightDiffCallback : DiffUtil.ItemCallback<SleepNight>() {
         override fun areItemsTheSame(oldItem: SleepNight, newItem: SleepNight): Boolean {
             return oldItem.nightId == newItem.nightId
         }
@@ -31,9 +33,10 @@ class SleepNightAdapter : ListAdapter<SleepNight, SleepNightAdapter.ViewHolder>(
 
     class ViewHolder private constructor(val binding: ListItemSleepTrackerBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: SleepNight) {
+        fun bind(item: SleepNight, listener: ItemClickListener) {
             //绑定数据
             binding.sleep = item
+            binding.listener = listener
             binding.executePendingBindings()
 //            val res = itemView.context.resources
 //            binding.sleepLength.text = convertDurationToFormatted(
@@ -53,10 +56,9 @@ class SleepNightAdapter : ListAdapter<SleepNight, SleepNightAdapter.ViewHolder>(
 
         companion object {
             fun from(parent: ViewGroup): ViewHolder {
-                val layoutInflater = LayoutInflater.from(parent.context)
 //                val view = layoutInflater
 //                        .inflate(R.layout.list_item_sleep_tracker, parent, false)
-                val bind = ListItemSleepTrackerBinding.inflate(layoutInflater, parent, false)
+                val bind = ListItemSleepTrackerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 return ViewHolder(bind)
             }
         }
@@ -74,10 +76,14 @@ class SleepNightAdapter : ListAdapter<SleepNight, SleepNightAdapter.ViewHolder>(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
-        holder.bind(item)
+        holder.bind(item, listener)
     }
 
 //    override fun getItemCount(): Int {
 //        return data.size
 //    }
+}
+
+class ItemClickListener(val listener: (sleepNight: SleepNight) -> Unit) {
+    fun onClick(sleepNight: SleepNight) = listener(sleepNight)
 }

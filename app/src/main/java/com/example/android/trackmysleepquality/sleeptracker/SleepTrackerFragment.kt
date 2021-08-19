@@ -17,6 +17,7 @@
 package com.example.android.trackmysleepquality.sleeptracker
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -73,13 +74,16 @@ class SleepTrackerFragment : Fragment() {
             }
         })
 
-        val adapter = SleepNightAdapter()
+        val adapter = SleepNightAdapter(ItemClickListener {
+            Log.i("TAG", "onCreateView:sleepNight= $it")
+        })
         binding.sleepList.adapter = adapter
 
-        viewModel.nights.observe(viewLifecycleOwner, Observer {
-            it?.let {
-                adapter.submitList(it)}
-        })
+        //用bindingAdapter 代替这个数据更新
+//        viewModel.nights.observe(viewLifecycleOwner, Observer {
+//            it?.let {
+//                adapter.submitList(it)}
+//        })
 
         return binding.root
     }
